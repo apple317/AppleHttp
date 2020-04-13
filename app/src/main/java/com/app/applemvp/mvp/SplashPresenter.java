@@ -51,7 +51,4 @@ public class SplashPresenter extends BasePresenter<SplashView> {
                 });
     }
 
-
-
-
 }

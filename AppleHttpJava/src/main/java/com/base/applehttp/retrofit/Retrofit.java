@@ -77,52 +77,7 @@ public final class Retrofit {
     this.validateEagerly = validateEagerly;
   }
 
-  /**
-   * Create an implementation of the API endpoints defined by the {@code service} interface.
-   * <p>
-   * The relative path for a given method is obtained from an annotation on the method describing
-   * the request type. The built-in methods are {@link GET GET},
-   * {@link retrofit2.http.PUT PUT}, {@link retrofit2.http.POST POST}, {@link retrofit2.http.PATCH
-   * PATCH}, {@link retrofit2.http.HEAD HEAD}, {@link retrofit2.http.DELETE DELETE} and
-   * {@link retrofit2.http.OPTIONS OPTIONS}. You can use a custom HTTP method with
-   * {@link HTTP @HTTP}. For a dynamic URL, omit the path on the annotation and annotate the first
-   * parameter with {@link Url @Url}.
-   * <p>
-   * Method parameters can be used to replace parts of the URL by annotating them with
-   * {@link retrofit2.http.Path @Path}. Replacement sections are denoted by an identifier
-   * surrounded by curly braces (e.g., "{foo}"). To add items to the query string of a URL use
-   * {@link retrofit2.http.Query @Query}.
-   * <p>
-   * The body of a request is denoted by the {@link retrofit2.http.Body @Body} annotation. The
-   * object will be converted to request representation by one of the {@link Converter.Factory}
-   * instances. A {@link RequestBody} can also be used for a raw representation.
-   * <p>
-   * Alternative request body formats are supported by method annotations and corresponding
-   * parameter annotations:
-   * <ul>
-   * <li>{@link retrofit2.http.FormUrlEncoded @FormUrlEncoded} - Form-encoded data with key-value
-   * pairs specified by the {@link retrofit2.http.Field @Field} parameter annotation.
-   * <li>{@link retrofit2.http.Multipart @Multipart} - RFC 2388-compliant multipart data with
-   * parts specified by the {@link retrofit2.http.Part @Part} parameter annotation.
-   * </ul>
-   * <p>
-   * Additional static headers can be added for an endpoint using the
-   * {@link retrofit2.http.Headers @Headers} method annotation. For per-request control over a
-   * header annotate a parameter with {@link Header @Header}.
-   * <p>
-   * By default, methods return a {@link Call} which represents the HTTP request. The generic
-   * parameter of the call is the response body type and will be converted by one of the
-   * {@link Converter.Factory} instances. {@link ResponseBody} can also be used for a raw
-   * representation. {@link Void} can be used if you do not care about the body contents.
-   * <p>
-   * For example:
-   * <pre>
-   * public interface CategoryService {
-   *   &#64;POST("category/{cat}/")
-   *   Call&lt;List&lt;Item&gt;&gt; categoryList(@Path("cat") String a, @Query("page") int b);
-   * }
-   * </pre>
-   */
+
   @SuppressWarnings("unchecked") // Single-interface proxy creation guarded by parameter safety.
   public <T> T create(final Class<T> service) {
     Utils.validateServiceInterface(service);
@@ -460,7 +415,6 @@ public final class Retrofit {
     /**
      * Set the API base URL.
      * <p>
-     * The specified endpoint values (such as with {@link GET @GET}) are resolved against this
      * value using {@link HttpUrl#resolve(String)}. The behavior of this matches that of an
      * {@code <a href="">} link on a website resolving on the current URL.
      * <p>

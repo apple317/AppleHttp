@@ -32,13 +32,26 @@ public class AppApiHelper extends ApiHelper {
 
     public AppApiHelper(Context context) {
         mContext = context;
-        baseHttp = getBaseHttp();
+        baseHttp = getOkHttpImpl();
+    }
+
+    public ApiService createApiService() {
+        return baseHttp.createApi(ApiService.class);
     }
 
 
-    public OkHttpImpl getBaseHttp() {
-        return BaseHttpClient.getBaseClient().getHttpImpl();
+    @Override
+    public void initHttp(Application context, String path) {
+        HttpConfiguration.Builder configuration = new HttpConfiguration.Builder(context);
+        configuration.retryOnConnectionFailure(true);
+        configuration.diskCacheSize(10 * 1024 * 1024);
+        configuration.setBaseUrl(path);
+        configuration.setCookieJar(new CookieJarImpl(new PersistentCookieStore(context)));
+        configuration.diskCacheDir(context.getCacheDir());
+        BaseHttpClient baseHttpClient = BaseHttpClient.getBaseClient();
+        baseHttpClient.init(configuration.build());
     }
+
 
 
     public <T> ObservableTransformer<T, T> handleResult() {
@@ -67,20 +80,4 @@ public class AppApiHelper extends ApiHelper {
     }
 
 
-    public ApiService createApiService() {
-        return baseHttp.createApi(ApiService.class);
-    }
-
-
-    @Override
-    public void initHttp(Application context, String path) {
-        HttpConfiguration.Builder configuration = new HttpConfiguration.Builder(context);
-        configuration.retryOnConnectionFailure(true);
-        configuration.diskCacheSize(10 * 1024 * 1024);
-        configuration.setBaseUrl(path);
-        configuration.setCookieJar(new CookieJarImpl(new PersistentCookieStore(context)));
-        configuration.diskCacheDir(context.getCacheDir());
-        BaseHttpClient baseHttpClient = BaseHttpClient.getBaseClient();
-        baseHttpClient.init(configuration.build());
-    }
 }
