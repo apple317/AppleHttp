@@ -1,11 +1,8 @@
 ## 前言
 
-  博主最近空了整理了mvp架构，其实在真实项目中小公司都是一个base，然后mvp基本都是activity、fragement对应一个
-Presenter或者view，以前用drager注入，一个项目有几百个model、Presenter、view,还都是类上泛型实现，业务层应该
-复用和公用、即用及注释，我这个就实现了原理靠注释、反射、动态代理、工厂模式,代码分为java和kotlin，请看对应分支，
-两套代码实现思路原理差不多，博客还会分享网络kotlin组件、插件化、热更新、eventbus、butterknife,博主这些年心得，
-所有技术其实原理大多都超不过100行代码，一定要动手实践，阅万千代码，不如搂一遍，实践是王道，博主马上会转flutter，
-麻烦多点星哦，谢谢！
+  博主最近分享了网络组件，完美适配Retrofit写法，本库目标会实现java、kotlin网络那个自由
+切换okhttp、volley、async等，目前已实现java版本okhttp，然后会抽离工厂模式兼容实现
+volley。
 
 - [Kotlin Android 扩展](https://www.kotlincn.net/docs/tutorials/android-plugin.html)是一个编译器扩展， 可以让你摆脱代码中的 `findViewById()` 调用，并将其替换为合成的编译器生成的属性。
 - [Anko](http://github.com/kotlin/anko) 是一个提供围绕 Android API 的 Kotlin 友好的包装器的库 ，以及一个可以用 Kotlin 代码替换布局 .xml 文件的 DSL。
@@ -13,88 +10,92 @@ Presenter或者view，以前用drager注入，一个项目有几百个model、Pr
 
 ###kotlin版本
 ```
-class MainActivity : BaseMvpActivity(), SplashView, MainView {
-    @CreatePresenterAnnotation(SplashPresenter::class)
-    var splashPresenter: SplashPresenter? = null
-    @CreatePresenterAnnotation(MainPresenter::class)
-    var mainPresenter: MainPresenter? = null
 
-    override fun setLayoutId(): Int {
-        return R.layout.activity_main
-    }
-
-    override fun initData() {
-        btnAdvert.setOnClickListener { splashPresenter?.advertList("kotlin 广告") }
-        btnSync.setOnClickListener { mainPresenter?.appSync("kotlin 同步") }
-    }
-
-    override fun appSync(msg: String) {
-        btnSync.text = msg
-    }
-
-    override fun advertList(advert: String) {
-        btnAdvert.text = advert
-    }
-
-    override fun initView(savedInstanceState: Bundle?) {
-    }
-}
 ```
 
 ###java版本
 ```
-public class MainActivity extends BaseMvpActivity implements SplashView, MainView{
+public OkHttpImpl baseHttp;
 
+    public Context mContext;
 
-    @BindView(R.id.btnSync)
-    Button btnSync;
-    @BindView(R.id.btnAdvert)
-    Button btnAdvert;
+    public AppApiHelper(Context context) {
+        mContext = context;
+        baseHttp = getOkHttpImpl();
+    }
 
+    public ApiService createApiService() {
+        return baseHttp.createApi(ApiService.class);
+    }
 
-    @CreatePresenterAnnotation(SplashPresenter.class)
-    SplashPresenter splashPresenter;
-
-    @CreatePresenterAnnotation(MainPresenter.class)
-    MainPresenter mainPresenter;
 
     @Override
-    public int setLayoutId() {
-        return R.layout.activity_main;
+    public void initHttp(Application context, String path) {
+        HttpConfiguration.Builder configuration = new HttpConfiguration.Builder(context);
+        configuration.retryOnConnectionFailure(true);
+        configuration.diskCacheSize(10 * 1024 * 1024);
+        configuration.setBaseUrl(path);
+        configuration.setCookieJar(new CookieJarImpl(new PersistentCookieStore(context)));
+        configuration.diskCacheDir(context.getCacheDir());
+        BaseHttpClient baseHttpClient = BaseHttpClient.getBaseClient();
+        baseHttpClient.init(configuration.build());
     }
+}
+
+public class AppleApplication extends BaseApplication {
+
+
+    public static AppApiHelper apiHelper;
+
+
+    public static AppApiHelper getApiHelper() {
+        return apiHelper;
+    }
+
 
     @Override
-    protected void initData() {
-
-    }
-
-    @Override
-    protected void initView(Bundle savedInstanceState) {
-        ButterKnife.bind(this);
-    }
-
-    @Override
-    public void appSync(String msg) {
-        btnSync.setText(msg);
-    }
-
-    @Override
-    public void advertList(String advert) {
-        btnAdvert.setText(advert);
+    public void onCreate() {
+        super.onCreate();
+        apiHelper = new AppApiHelper(getApplicationContext());
+        apiHelper.initHttp(this, "https://api.apiopen.top/");
     }
 
 
-    @OnClick({R.id.btnSync, R.id.btnAdvert})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.btnSync:
-                mainPresenter.appSync("首页初始化");
-                break;
-            case R.id.btnAdvert:
-                splashPresenter.advertList("启动页初始化");
-                break;
-        }
+}
+public class SplashPresenter extends BasePresenter<SplashView> {
+
+    private AppApiHelper appApiHelper;
+
+
+    public SplashPresenter() {
+        appApiHelper= AppleApplication.getApiHelper();
     }
+
+
+    /**
+     * 广告方法
+     */
+    public void advertList() {
+        HashMap body = new HashMap();
+        body.put("type", "1");
+        appApiHelper.createApiService().otherCategory(body)
+                .compose(appApiHelper.handleResult())
+                .compose(getView().bindLifeycle(false))
+                .subscribe(new RxResSubscriber<BaseResultEntity<List<RankingEntity>>>() {
+                    @Override
+                    public void onError(HttpException exception) {
+                        getView().hideProgress();
+                        getView().advertList( null);
+                    }
+
+                    @Override
+                    public void onNextData(BaseResultEntity<List<RankingEntity>> inputPhoneEntity) {
+                        getView().hideProgress();
+                        getView().advertList( inputPhoneEntity.getResult());
+                    }
+                });
+    }
+
 }
 ```
 ## 更新日志
