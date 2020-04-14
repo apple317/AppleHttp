@@ -33,7 +33,7 @@ dependencies {
     implementation 'com.applehsp.mvp:MvpJava:1.0.0'
     implementation 'com.jakewharton:butterknife:10.2.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.0'
-    api project(path: ':AppleHttpJava')
+    implementation 'com.applehsp.http:AppleHttpJava:1.0.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
     implementation 'com.github.bumptech.glide:glide:4.8.0'
 }

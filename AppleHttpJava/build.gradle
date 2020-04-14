@@ -40,7 +40,7 @@ apply plugin: 'com.jfrog.bintray'
 
 //以下是需要针对项目需要修改的配置内容
 //发布者的组织名称
-group = "com.applehsp.mvp"
+group = "com.applehsp.http"
 // 版本号，下次更新是只需要更改版本号即可
 version = "1.0.0"
 //上面配置后上传至bintray后的编译路径是这样的： compile 'com.clwater:bintraylibrary:0.0.1'
@@ -53,15 +53,15 @@ def bintrayUser = properties.getProperty("bintray.user")
 def bintrayKey = properties.getProperty("bintray.apikey")
 
 //项目主页
-def siteUrl = 'https://github.com/apple317/AppleMvp.git'
+def siteUrl = 'https://github.com/apple317/AppleHttp.git'
 //项目的版本控制地址
-def gitUrl = 'https://github.com/apple317/AppleMvp.git'
+def gitUrl = 'https://github.com/apple317/AppleHttp.git'
 //发布到JCenter上的项目名字，必须填写
-def libName = "mvp-java"
+def libName = "http-java"
 //文档连接
-def javaDocLinks = "https://github.com/clwater"
+def javaDocLinks = "https://github.com/apple317"
 //Bintray中Repository的名字
-def bintrayRepo = "com.applehsp.mvp"
+def bintrayRepo = "com.applehsp.http"
 //应用的描述
 def bintrayDesc = "Desc"
 //组织的名字, 建立组织账号后上传的时候需要这个, 个人张海时候不需要修改这部分
