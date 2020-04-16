@@ -15,16 +15,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
-    afterEvaluate {
-        generateReleaseBuildConfig.enabled = false
-        generateDebugBuildConfig.enabled = false
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
-    }
 }
 
 dependencies {
@@ -42,7 +32,7 @@ apply plugin: 'com.jfrog.bintray'
 //发布者的组织名称
 group = "com.applehsp.http"
 // 版本号，下次更新是只需要更改版本号即可
-version = "1.0.0"
+version = "1.0.1"
 //上面配置后上传至bintray后的编译路径是这样的： compile 'com.clwater:bintraylibrary:0.0.1'
 
 Properties properties = new Properties()
